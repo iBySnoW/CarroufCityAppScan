@@ -6,7 +6,7 @@
 }
 
 nav {
-  width: 100vw;
+  width: 100%;
   height: 70px;
   background: linear-gradient(103deg, #FFFAFA 9.69%, rgba(228, 232, 252, 0) 100%);
 }

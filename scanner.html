@@ -1,53 +1,438 @@
 <!DOCTYPE html>
 <html lang="en">
+     <head>
+          <meta charset="UTF-8" />
+          <meta
+               name="viewport"
+               content="width=device-width, initial-scale=1.0"
+          />
+          <title>Camera Page</title>
+          <link rel="stylesheet" href="listing.css" />
+          <link rel="stylesheet" href="https://use.typekit.net/ruf3dez.css" />
+          <link
+               rel="stylesheet"
+               href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+          />
+          <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+          <style>
+               body {
+                    padding: 0;
+                    margin: 0;
+                    overflow: hidden;
+                    height: 100vh;
+                    background-color: #f0f0f0;
+                    font-family: "museo-sans", sans-serif;
+                    overflow: hidden;
+               }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera Page</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-    }
+               #camera {
+                    width: 100vw;
+                    height: 100vh;
+                    z-index: 0;
+                    object-fit: cover;
+               }
 
-    video {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-</head>
+               .cameraContainer {
+                    position: relative;
+                    width: 100vw;
+                    height: 100vh;
+               }
 
-<body>
-  <div id="cameraContainer">
-    <video id="camera" autoplay playsinline></video>
-  </div>
+               .cameraContainer_footer {
+                    width: 100%;
+                    height: 100%;
+               }
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const cameraContainer = document.getElementById('cameraContainer');
-      const video = document.getElementById('camera');
+               .scanSquare {
+                    position: absolute;
+                    z-index: 1;
+                    height: 200px;
+                    width: calc(100% - 50px);
+                    border: 3px solid white;
+                    border-radius: 10px;
+                    bottom: 30%;
+                    left: 50%;
+                    transform: translateX(-50%);
+               }
 
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then((stream) => {
-            video.srcObject = stream;
-          })
-          .catch((error) => {
-            console.error('Error accessing camera:', error);
-            // You can handle the error, display a message, etc.
-          });
-      } else {
-        console.error('getUserMedia is not supported on this browser');
-        // You can handle the lack of support, display a message, etc.
-      }
-    });
-  </script>
-</body>
+               .scanedArticle {
+                    position: absolute;
+                    bottom: -20%;
+                    left: 0;
+                    width: 100%;
+                    background-color: white;
+                    border-radius: 30px 30px 0 0;
+                    height: 45%;
+                    z-index: 1;
+                    transition: height 0.5s ease-in-out, width 0.5s ease-in-out,
+                         border-radius 0.5s ease-in-out, bottom 0.5s ease-in-out;
+                    display: flex; /* Utilisez flexbox pour aligner les éléments */
+                    flex-direction: column;
+                    padding: 20px; /* Ajoutez du padding à l'intérieur */
+               }
 
+               .articleImage img {
+                    height: 100%; /* Hauteur de l'image */
+                    border-radius: 10px; /* Bordure arrondie pour l'image */
+                    margin-right: 20px; /* Espace entre l'image et le texte */
+               }
+
+               .articleDetails {
+                    flex-grow: 1; /* Les détails prennent tout l'espace restant */
+               }
+
+               .articleDetails h1,
+               .articleDetails h2 {
+                    margin: 0; /* Supprimez la marge par défaut */
+                    /* Appliquez les styles de police comme sur l'image fournie */
+               }
+
+               .articleDetails_top {
+                    display: flex;
+                    margin-bottom: 4rem;
+               }
+
+               .articleRating {
+                    display: flex; /* Utilisez flexbox pour aligner le score et l'indicateur */
+                    align-items: center; /* Centre verticalement */
+                    margin-top: 10px; /* Espace au-dessus de la notation */
+               }
+
+               .ratingScore {
+                    /* Styles pour le score */
+                    font-weight: bold;
+               }
+
+               .ratingStatus {
+                    /* Styles pour le statut */
+                    margin-left: 10px; /* Espace entre le score et le statut */
+               }
+
+               .ratingIndicator {
+                    width: 10px; /* Largeur de l'indicateur */
+                    height: 10px; /* Hauteur de l'indicateur */
+                    border-radius: 50%; /* Rendre l'indicateur circulaire */
+                    background-color: green; /* Couleur de fond pour l'indicateur */
+                    margin-left: 10px; /* Espace entre le statut et l'indicateur */
+               }
+
+               .fullScreen {
+                    height: 100vh; /* Hauteur pleine écran */
+                    width: 100vw; /* Largeur pleine écran */
+                    bottom: 0px; /* Collé au bas */
+                    border-radius: 0; /* Pas de bordure arrondie quand en plein écran */
+               }
+               .articleImage {
+                    height: 100px;
+               }
+
+               #nav {
+                    display: none;
+               }
+
+               .fade-element {
+                    transition: opacity 0.5s ease-in-out; /* Transition sur l'opacité sur une durée de 0.5 secondes */
+                    opacity: 1; /* Opacité de départ à 1 - totalement visible */
+               }
+
+               .fade-element.hidden {
+                    opacity: 0; /* L'élément est totalement transparent */
+                    pointer-events: none; /* Empêche les interactions de souris lorsque l'élément est caché */
+               }
+          </style>
+     </head>
+
+     <body>
+          <div class="cameraContainer">
+               <video id="camera" autoplay playsinline></video>
+
+               <div class="cameraContainer_footer">
+                    <div class="scanSquare" />
+               </div>
+               <div class="scanedArticle" id="scanedArticle">
+                    <nav id="nav" class="fade-element">
+                         <ul>
+                              <li>Produit</li>
+                              <li class="accompte"></li>
+                         </ul>
+                    </nav>
+                    <div class="articleDetails">
+                         <div class="articleDetails_top">
+                              <div class="articleImage">
+                                   <!-- Image ici -->
+                                   <img
+                                        class="articleImg"
+                                        src="https://s3-alpha-sig.figma.com/img/5bad/97a1/c4480821bbf06bdde5a1d4b48ea2f081?Expires=1704067200&Signature=By-MbSTaR9x7yqsyJfe0Q~Blf7cwxXp5Fu9RlLdwTcgf65ldrBJPBUu3VjwibIlgRFus2ie0tyR04EBLERLLzwYAubKdE-KPGhTPIL~nnu~Gc8exEmoD~cg9Qp3o7IrlAz0vMBfYVRyLYa7L-V1kG2DA3JD~Y8S7lo0tvwVB7LU05~mrCjdIqNvzyMOUbgyuKks2CVDF9EzXY5feAbGdh60rVrcAQ4-PKOG1esu3hyMGYMoApEZ2RnhqW2lvRYF~IjJROzKz0GlgT8jax9OcXSKaMntXVxirthfX1Ck~FTWUOXDlAnyGfp6CDoHhGTRlxm7zoqNYxPhuAL9A44534g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
+                                        alt="Chili con carne"
+                                        srcset=""
+                                   />
+                              </div>
+                              <div>
+                                   <h1>Chili con carne</h1>
+                                   <h2>Carrefour</h2>
+                              </div>
+                         </div>
+                         <div class="articleRating">
+                              <span class="ratingScore">100/100</span>
+                              <span class="ratingStatus">Excellent</span>
+                              <div class="ratingIndicator"></div>
+                         </div>
+                         <div class="group-33">
+                              <div class="frame-34">
+                                   <div class="d-fauts">Défauts</div>
+                                   <div class="pour-100-g">Pour 100g</div>
+                              </div>
+                              <div class="frame-32">
+                                   <div class="frame-342">
+                                        <div class="frame-322">
+                                             <svg
+                                                  class="ion-water-sharp"
+                                                  width="24"
+                                                  height="25"
+                                                  viewBox="0 0 24 25"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M12 2.55835C12 2.55835 5.25 9.97866 5.25 15.2287C5.25 19.3705 7.85812 21.9787 12 21.9787C16.1419 21.9787 18.75 19.3705 18.75 15.2287C18.75 9.97866 12 2.55835 12 2.55835ZM12.75 19.5412V18.4162C13.4957 18.4153 14.2105 18.1187 14.7378 17.5914C15.265 17.0642 15.5616 16.3493 15.5625 15.6037H16.6875C16.6864 16.6476 16.2712 17.6485 15.533 18.3867C14.7948 19.1248 13.7939 19.54 12.75 19.5412Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+
+                                             <div class="frame-323">
+                                                  <div class="calories">
+                                                       Calories
+                                                  </div>
+                                                  <div class="peu-calorique">
+                                                       Peu calorique
+                                                  </div>
+                                             </div>
+                                        </div>
+                                        <div class="frame-324">
+                                             <div class="_0-kcal">0kcal</div>
+                                             <svg
+                                                  class="ellipse-2"
+                                                  width="10"
+                                                  height="11"
+                                                  viewBox="0 0 10 11"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M10 5.5C10 8.26142 7.76142 10.5 5 10.5C2.23858 10.5 0 8.26142 0 5.5C0 2.73858 2.23858 0.5 5 0.5C7.76142 0.5 10 2.73858 10 5.5Z"
+                                                       fill="#52A024"
+                                                  />
+                                             </svg>
+
+                                             <svg
+                                                  class="ep-arrow-up-bold"
+                                                  width="12"
+                                                  height="13"
+                                                  viewBox="0 0 12 13"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M1.22704 4.46984C1.36768 4.32923 1.55841 4.25025 1.75729 4.25025C1.95616 4.25025 2.14689 4.32923 2.28754 4.46984L6.00004 8.18234L9.71254 4.46984C9.85399 4.33322 10.0434 4.25762 10.2401 4.25933C10.4367 4.26104 10.6248 4.33992 10.7639 4.47897C10.903 4.61803 10.9818 4.80614 10.9835 5.00279C10.9853 5.19943 10.9097 5.38888 10.773 5.53034L6.53029 9.77309C6.38964 9.91369 6.19891 9.99268 6.00004 9.99268C5.80116 9.99268 5.61043 9.91369 5.46979 9.77309L1.22704 5.53034C1.08643 5.38969 1.00745 5.19896 1.00745 5.00009C1.00745 4.80121 1.08643 4.61048 1.22704 4.46984Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+                                        </div>
+                                   </div>
+                                   <div class="frame-69">
+                                        <div class="frame-322">
+                                             <svg
+                                                  class="ion-water-sharp2"
+                                                  width="24"
+                                                  height="25"
+                                                  viewBox="0 0 24 25"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M12 2.55835C12 2.55835 5.25 9.97866 5.25 15.2287C5.25 19.3705 7.85812 21.9787 12 21.9787C16.1419 21.9787 18.75 19.3705 18.75 15.2287C18.75 9.97866 12 2.55835 12 2.55835ZM12.75 19.5412V18.4162C13.4957 18.4153 14.2105 18.1187 14.7378 17.5914C15.265 17.0642 15.5616 16.3493 15.5625 15.6037H16.6875C16.6864 16.6476 16.2712 17.6485 15.533 18.3867C14.7948 19.1248 13.7939 19.54 12.75 19.5412Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+
+                                             <div class="frame-323">
+                                                  <div class="calories">
+                                                       Calories
+                                                  </div>
+                                                  <div class="peu-calorique">
+                                                       Peu calorique
+                                                  </div>
+                                             </div>
+                                        </div>
+                                        <div class="frame-324">
+                                             <div class="_0-kcal">0kcal</div>
+                                             <svg
+                                                  class="ellipse-22"
+                                                  width="10"
+                                                  height="11"
+                                                  viewBox="0 0 10 11"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M10 5.5C10 8.26142 7.76142 10.5 5 10.5C2.23858 10.5 0 8.26142 0 5.5C0 2.73858 2.23858 0.5 5 0.5C7.76142 0.5 10 2.73858 10 5.5Z"
+                                                       fill="#52A024"
+                                                  />
+                                             </svg>
+
+                                             <svg
+                                                  class="ep-arrow-up-bold2"
+                                                  width="12"
+                                                  height="13"
+                                                  viewBox="0 0 12 13"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M1.22704 4.46984C1.36768 4.32923 1.55841 4.25025 1.75729 4.25025C1.95616 4.25025 2.14689 4.32923 2.28754 4.46984L6.00004 8.18234L9.71254 4.46984C9.85399 4.33322 10.0434 4.25762 10.2401 4.25933C10.4367 4.26104 10.6248 4.33992 10.7639 4.47897C10.903 4.61803 10.9818 4.80614 10.9835 5.00279C10.9853 5.19943 10.9097 5.38888 10.773 5.53034L6.53029 9.77309C6.38964 9.91369 6.19891 9.99268 6.00004 9.99268C5.80116 9.99268 5.61043 9.91369 5.46979 9.77309L1.22704 5.53034C1.08643 5.38969 1.00745 5.19896 1.00745 5.00009C1.00745 4.80121 1.08643 4.61048 1.22704 4.46984Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+                                        </div>
+                                   </div>
+                                   <div class="frame-70">
+                                        <div class="frame-322">
+                                             <svg
+                                                  class="ion-water-sharp3"
+                                                  width="24"
+                                                  height="25"
+                                                  viewBox="0 0 24 25"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M12 2.55835C12 2.55835 5.25 9.97866 5.25 15.2287C5.25 19.3705 7.85812 21.9787 12 21.9787C16.1419 21.9787 18.75 19.3705 18.75 15.2287C18.75 9.97866 12 2.55835 12 2.55835ZM12.75 19.5412V18.4162C13.4957 18.4153 14.2105 18.1187 14.7378 17.5914C15.265 17.0642 15.5616 16.3493 15.5625 15.6037H16.6875C16.6864 16.6476 16.2712 17.6485 15.533 18.3867C14.7948 19.1248 13.7939 19.54 12.75 19.5412Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+
+                                             <div class="frame-323">
+                                                  <div class="calories">
+                                                       Calories
+                                                  </div>
+                                                  <div class="peu-calorique">
+                                                       Peu calorique
+                                                  </div>
+                                             </div>
+                                        </div>
+                                        <div class="frame-324">
+                                             <div class="_0-kcal">0kcal</div>
+                                             <svg
+                                                  class="ellipse-23"
+                                                  width="10"
+                                                  height="11"
+                                                  viewBox="0 0 10 11"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M10 5.5C10 8.26142 7.76142 10.5 5 10.5C2.23858 10.5 0 8.26142 0 5.5C0 2.73858 2.23858 0.5 5 0.5C7.76142 0.5 10 2.73858 10 5.5Z"
+                                                       fill="#52A024"
+                                                  />
+                                             </svg>
+
+                                             <svg
+                                                  class="ep-arrow-up-bold3"
+                                                  width="12"
+                                                  height="13"
+                                                  viewBox="0 0 12 13"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                             >
+                                                  <path
+                                                       d="M1.22704 4.46984C1.36768 4.32923 1.55841 4.25025 1.75729 4.25025C1.95616 4.25025 2.14689 4.32923 2.28754 4.46984L6.00004 8.18234L9.71254 4.46984C9.85399 4.33322 10.0434 4.25762 10.2401 4.25933C10.4367 4.26104 10.6248 4.33992 10.7639 4.47897C10.903 4.61803 10.9818 4.80614 10.9835 5.00279C10.9853 5.19943 10.9097 5.38888 10.773 5.53034L6.53029 9.77309C6.38964 9.91369 6.19891 9.99268 6.00004 9.99268C5.80116 9.99268 5.61043 9.91369 5.46979 9.77309L1.22704 5.53034C1.08643 5.38969 1.00745 5.19896 1.00745 5.00009C1.00745 4.80121 1.08643 4.61048 1.22704 4.46984Z"
+                                                       fill="black"
+                                                  />
+                                             </svg>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <h1>Idées de recettes</h1>
+                         <div class="swiper">
+                              <!-- Additional required wrapper -->
+                              <div class="swiper-wrapper">
+                                   <!-- Slides -->
+                                   <div class="swiper-slide">
+                                        <img src="image 3.png" />
+                                   </div>
+                                   <div class="swiper-slide">
+                                        <img src="image 4.png" />
+                                   </div>
+                                   <div class="swiper-slide">
+                                        <img src="image 4(1).png" />
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+
+          <script>
+               document.addEventListener("DOMContentLoaded", () => {
+                    const cameraContainer =
+                         document.getElementById("cameraContainer");
+                    const video = document.getElementById("camera");
+
+                    if (
+                         navigator.mediaDevices &&
+                         navigator.mediaDevices.getUserMedia
+                    ) {
+                         navigator.mediaDevices
+                              .getUserMedia({ video: true })
+                              .then((stream) => {
+                                   video.srcObject = stream;
+                              })
+                              .catch((error) => {
+                                   console.error(
+                                        "Error accessing camera:",
+                                        error
+                                   );
+                                   // You can handle the error, display a message, etc.
+                              });
+                    } else {
+                         console.error(
+                              "getUserMedia is not supported on this browser"
+                         );
+                         // You can handle the lack of support, display a message, etc.
+                    }
+
+                    // Ajoutez cette partie pour la balise scanedArticle
+                    const scanedArticle =
+                         document.getElementById("scanedArticle");
+
+                    const nav = document.getElementById("nav");
+                    let isFullScreen = false; // Drapeau pour le suivi de l'état plein écran
+
+                    scanedArticle.addEventListener("click", () => {
+                         if (isFullScreen) {
+                              // Si en plein écran, réduisez
+                              scanedArticle.classList.remove("fullScreen");
+                              
+                              nav.classList.add('hidden');
+                         } else {
+                              // Si réduit, passez en plein écran
+                              scanedArticle.classList.add("fullScreen");
+                              nav.style.display = "block";
+                              nav.classList.remove('hidden');
+                         }
+                         // Basculer l'état du drapeau
+                         isFullScreen = !isFullScreen;
+                    });
+               });
+               const swiper = new Swiper(".swiper", {
+                    // Optional parameters
+                    direction: "horizontal",
+                    loop: true,
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+               });
+          </script>
+     </body>
 </html>
