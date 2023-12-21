@@ -314,3 +314,26 @@ main .list-produits .produit .info .prix::before {
   position: relative;
   overflow: visible;
 }/*# sourceMappingURL=listing.css.map */
+.swiper {
+  width: 90%;
+  height: 200px;
+  margin: auto;
+}
+.swiper-slide{
+  width: auto;
+  height: 100px;
+}
+.swiper img{
+  border-radius: 25px;
+  object-fit: contain;
+  position: relative;
+}
+.swiper img::before{
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, #0C325E 0%, rgba(12, 50, 94, 0.53) 35.14%, rgba(12, 50, 94, 0.36) 46.63%, rgba(12, 50, 94, 0.00) 96.87%);
+  border-radius: 25px;
+}
