@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Page</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cameraContainer">
+    <video id="camera" autoplay playsinline></video>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cameraContainer = document.getElementById('cameraContainer');
+      const video = document.getElementById('camera');
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then((stream) => {
+            video.srcObject = stream;
+          })
+          .catch((error) => {
+            console.error('Error accessing camera:', error);
+            // You can handle the error, display a message, etc.
+          });
+      } else {
+        console.error('getUserMedia is not supported on this browser');
+        // You can handle the lack of support, display a message, etc.
+      }
+    });
+  </script>
+</body>
+
+</html>
